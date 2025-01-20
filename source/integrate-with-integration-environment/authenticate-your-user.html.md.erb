@@ -175,6 +175,8 @@ Use the guidance in the following table to replace placeholder values in your ex
 | `ui_locales`    | Optional             | GOV.UK One Login supports English and Welsh as language choices. <br><br> If your service is in Welsh, you may want to display GOV.UK One Login in Welsh for a consistent user experience. You can use `ui_locales` to do this. <br> <br> In the `ui_locales` parameter, you can choose either `en` (English) or `cy` (Welsh). <br><br> Using `ui_locales` is optional. If you do not include it, your service will continue using English by default. <br><br> GOV.UK One Login does not support any other languages. |
 | `vtr`           | Optional             | The `vtr` parameter represents ‘Vectors of Trust’ where you request authentication and, optionally, identity proving. For example, if you want the medium level of authentication and medium identity confidence, request `vtr=[“Cl.Cm.P2”]`. <br><br>You selected your Vector of Trust when you [chose the level of authentication][integrate.choose-level-of-auth] and [the level of identity confidence][integrate.choose-level-of-confidence] for your service.<br><br>You can read more about how to combine the vectors for authentication level and identity confidence in [Section 3 of RFC 8485](https://datatracker.ietf.org/doc/html/rfc8485#section-3.1). If you need identity proving, you must request `Cl.Cm` (the medium level of authentication).<br><br>If you do not specify the `vtr` parameter, your service will automatically log your users in at the medium level of authentication (`Cl.Cm`). This means you will not receive identity attributes in your response. |
 | `claims`        | Optional             | To get the identity attributes your service needs, you should specify these in the `claims` parameter using the `/userinfo` endpoint. The `/userinfo` endpoint returns a JSON object listing the requested claims.<br><br>You can read more about [choosing which user attributes your service can request][integrate.choose-user-attributes].<br><br>You can [read more about the structure of the claims request in OpenID Connect section 5.5](https://openid.net/specs/openid-connect-core-1_0.html#ClaimsParameter). |
+| `max_age`       | Optional             | `max_age` is only available to services not on the GOV.UK domain and those handling particularly sensitive data. Contact GOV.UK One Login support (https://www.sign-in.service.gov.uk/support) for more information. When the `max_age` parameter is included in your request, your user will be forced to reauthenticate if the time in seconds since authentication is greater than `max_age`. `max_age` must be set to zero or a positive integer. |
+
 
 ### Generate an authorisation code
 
@@ -346,6 +348,7 @@ The `id_token` parameter in the response for ‘Make a token request’ contains
   "nonce": "lZk16Vmu8-h7r8L8bFFiHJxpC3L73UBpfb68WC1Qoqg",
   "vtm": "https://oidc.integration.account.gov.uk/trustmark",
   "sid": "dX5xv0XgHh6yfD1xy-ss_1EDK0I"
+  "auth_time": 1704894300
  }
 
 ```
@@ -364,6 +367,7 @@ You can use the following table to understand the ID token’s claims.
 | `nonce` | The `nonce` value your application provided when you made the request to the `/authorize` endpoint. |
 | `vtm`   | `vtm` stands for 'vector trust mark'. This is an HTTPS URL which lists the range of values GOV.UK One Login accepts and provides.  |
 | `sid`   | `sid` stands for ‘session identifier’. This uniquely identifies the user's journey within GOV.UK One Login. |
+| `auth_time` | `auth_time` is the time at which your user last authenticated, which will be an integer timestamp representing the number of seconds since the [Unix Epoch][external.unix-epoch]. |
 
 Now you’ve understood what’s in your ID token, you’ll need to validate it.
 
@@ -380,6 +384,7 @@ Now you’ve understood what’s in your ID token, you’ll need to validate it.
 1. Check the current time is after the time in the `iat` claim.
 1. If you set a `nonce` value in the request to the `/authorize` endpoint, check this matches the `nonce` value in the ID token.
 1. The `vot` claim must contain the credential trust level you asked for in the request to the `/authorize` endpoint. The `vot` claim will only contain the credential trust level, not the level of confidence, even if you make an identity request. For example, if you set the `vtr` parameter to `Cl.Cm.P2`, you must ensure the `vot` claim is equal to `Cl.Cm`.
+1. If you included `max_age` in the request to the `/authorize` endpoint, you must validate that `auth_time` is greater than or equal to the current time subtract the value of `max_age`. If false, you should reject the ID token and redirect the user to re-authenticate, by sending a new authorisation request including `max_age`.
 
 ### Error handling for ‘Make a token request’
 

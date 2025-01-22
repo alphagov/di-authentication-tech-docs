@@ -218,7 +218,7 @@ Follow the steps below to use the `kid` to determine which public key from the D
   * Integration: [https://identity.integration.account.gov.uk/.well-known/did.json](https://identity.integration.account.gov.uk/.well-known/did.json) 
   * Production: [https://identity.account.gov.uk/.well-known/did.json](https://identity.account.gov.uk/.well-known/did.json). 
 1. Make sure the controller ID matches the `id` in the DID document.
-1. Find the object in `assertionMethods` which has an `id` field matching the `kid` from the JWT header. If there are multiple keys in the DID document, GOV.UK One Login is in the process of rotating its keys. If there’s a key without a matching `id`, do not trust the identity and contact GOV.UK One Login to report an incident.
+1. Find the object in `assertionMethods` which has an `id` field matching the `kid` from the JWT header. If there are multiple keys in the DID document, GOV.UK One Login is in the process of rotating its keys. If receive a `kid` that does not correspond to an `id` in the DID document, do not trust the identity and contact GOV.UK One Login to report an incident.
 1. Use the `publicKeyJwk` object of the key you want to use to verify the signature. 
 
 #### Cache the DID document 

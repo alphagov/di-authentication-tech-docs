@@ -1,7 +1,7 @@
 ---
 title: Prove your user's identity
 weight: 5.6
-last_reviewed_on: 2024-07-09
+last_reviewed_on: 2025-02-12
 review_in: 6 months
 ---
 
@@ -326,9 +326,14 @@ licence, if they submitted one when proving their identity.
 
 ## Understand your user’s return code claim
 
-The `https://vocab.account.gov.uk/v1/returnCode` claim gives information about any issues with the evidence your user provided to prove their identity. For example, if GOV.UK One Login was not able to prove your user’s identity. 
+<%= warning_text('We recommend requesting the return code claim to make your error handling more clear. ') %>
 
-To use this claim, you must let us know when [registering your service with GOV.UK One Login][integrate.register-your-service].
+To use the `returnCode` claim, you'll need to: 
+
+1. Enable the `returnCode` claim when you register your service.
+1. Include `https://vocab.account.gov.uk/v1/returnCode` when you [make a request for authentication and identity](https://docs.sign-in.service.gov.uk/integrate-with-integration-environment/authenticate-your-user/#make-a-request-for-authentication-and-identity). 
+
+The `https://vocab.account.gov.uk/v1/returnCode` claim gives information about any issues with the evidence your user provided to prove their identity. For example, if GOV.UK One Login was not able to prove your user’s identity. 
 
 When you use this claim and there’s an issue with the evidence your user provided to prove their identity:
 
@@ -337,7 +342,7 @@ When you use this claim and there’s an issue with the evidence your user provi
 1. When you make a request to the `/userinfo` endpoint using the access token, the response may contain only authentication data, and an array of one or more `returnCode` values, which will each be a letter.
 1. For security reasons, you’ll need to contact GOV.UK One Login on [govuk-one-login@digital.cabinet-office.gov.uk](mailto:govuk-one-login@digital.cabinet-office.gov.uk) for more detailed information on what issue each `returnCode` value stands for.  
 
-Currently, there are 11 `returnCode` values which GOV.UK One Login could return if there’s an issue with the evidence your user provided to prove their identity. You may receive a return code even if a user’s identity verification is successful, for example, if a user is a politically exposed person. Contact GOV.UK One Login on [govuk-one-login@digital.cabinet-office.gov.uk](mailto:govuk-one-login@digital.cabinet-office.gov.uk) for more detailed information on what each return code means.  
+Currently, there are 9 `returnCode` values which GOV.UK One Login could return if there’s an issue with the evidence your user provided to prove their identity. You may receive a return code even if a user’s identity verification is successful, for example, if a user is a politically exposed person. Contact GOV.UK One Login on [govuk-one-login@digital.cabinet-office.gov.uk](mailto:govuk-one-login@digital.cabinet-office.gov.uk) for more detailed information on what each return code means.  
 
 | Property         | Definition                                                                                                                                                                                                                            |
 |------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
